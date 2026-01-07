@@ -34,7 +34,8 @@ if st.button("🗑 データ初期化"):
     upper, lowers = create_initial_teams()
     season = 0
     save_teams(SAVE_FILE, season, upper, lowers)
-    st.experimental_rerun()
+    st.rerun()
+
 
 st.divider()
 st.subheader(f"現在のシーズン：{season}")
