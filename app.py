@@ -1,11 +1,8 @@
 import streamlit as st
 import os
-from league import (
-    create_initial_teams,
-    load_teams,
-    save_teams,
-    simulate_season
-)
+
+from league import create_initial_teams, load_teams, save_teams, simulate_season
+
 
 SAVE_FILE = "league_save.json"
 
