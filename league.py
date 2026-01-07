@@ -48,7 +48,8 @@ def play_match(a, b):
 
 # ======================
 # ラウンドロビン
-# ======================def round_robin(teams):
+# ======================
+    def round_robin(teams):
     teams = list(teams)
     wins = {t.name: 0 for t in teams}
 
