@@ -61,6 +61,7 @@ def round_robin(teams, double=False):
                 winner, _ = play_match(teams[i], teams[j])
                 wins[winner.name] += 1
 
+    # ★ 重要：返すのは Team オブジェクト
     return sorted(teams, key=lambda t: wins[t.name], reverse=True)
 
 
