@@ -49,17 +49,20 @@ def play_match(a, b):
 # ======================
 # ラウンドロビン
 # ======================
-def round_robin(teams):
+def round_robin(teams, double=False):
     teams = list(teams)
     wins = {t.name: 0 for t in teams}
 
-    for i in range(len(teams)):
-        for j in range(i + 1, len(teams)):
-            winner, _ = play_match(teams[i], teams[j])
-            wins[winner.name] += 1
+    repeat = 2 if double else 1
+
+    for _ in range(repeat):
+        for i in range(len(teams)):
+            for j in range(i + 1, len(teams)):
+                winner, _ = play_match(teams[i], teams[j])
+                wins[winner.name] += 1
 
     return sorted(teams, key=lambda t: wins[t.name], reverse=True)
-
+    
 
 
 # ======================
