@@ -42,12 +42,30 @@ st.subheader(f"現在のシーズン：{season}")
 # -------------------------
 # 表示
 # -------------------------
-st.header("上位リーグ")
-for i, t in enumerate(upper, 1):
-    st.write(f"{i}. {t.name}（STR {t.strength}）")
+st.header("上位リーグ（チーム名編集）")
 
-for i, league in enumerate(lowers):
-    st.header(f"下部リーグ {i}")
-    for j, t in enumerate(league, 1):
-        st.write(f"{j}. {t.name}（STR {t.strength}）")
+for i, t in enumerate(upper):
+    new_name = st.text_input(
+        label=f"上位 {i+1}",
+        value=t.name,
+        key=f"upper_{i}"
+    )
+    if new_name != t.name:
+        upper[i] = t._replace(name=new_name)
+        save_teams(SAVE_FILE, season, upper, lowers)
+
+
+for li, league in enumerate(lowers):
+    st.header(f"下部リーグ {li+1}")
+
+    for ti, t in enumerate(league):
+        new_name = st.text_input(
+            label=f"下部{li+1}-{ti+1}",
+            value=t.name,
+            key=f"lower_{li}_{ti}"
+        )
+        if new_name != t.name:
+            lowers[li][ti] = t._replace(name=new_name)
+            save_teams(SAVE_FILE, season, upper, lowers)
+
 
