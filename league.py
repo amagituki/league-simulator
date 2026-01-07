@@ -213,6 +213,8 @@ def simulate_season(season, upper, lowers):
 
     team_map = {t.name: t for t in all_teams}
 
+    upper_rank = upper_split(upper)
+
 
     record_upper(season, upper_rank, team_map)
     for i, r in enumerate(lower_ranks):
