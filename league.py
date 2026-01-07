@@ -51,18 +51,17 @@ def play_match(a, b):
 # ======================
 def round_robin(teams, double=False):
     teams = list(teams)
-    wins = {t.name: 0 for t in teams}
+    wins = {team: 0 for team in teams}
 
-    repeat = 2 if double else 1
+    for i in range(len(teams)):
+        for j in range(i + 1, len(teams)):
+            t1, t2 = teams[i], teams[j]
 
-    for _ in range(repeat):
-        for i in range(len(teams)):
-            for j in range(i + 1, len(teams)):
-                winner, _ = play_match(teams[i], teams[j])
-                wins[winner.name] += 1
+            for _ in range(2 if double else 1):
+                winner = t1 if random.random() < t1.strength / (t1.strength + t2.strength) else t2
+                wins[winner] += 1
 
-    # ★ 重要：返すのは Team オブジェクト
-    return sorted(teams, key=lambda t: wins[t.name], reverse=True)
+    return sorted(teams, key=lambda t: wins[t], reverse=True)
 
 
 
