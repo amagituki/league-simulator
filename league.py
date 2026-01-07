@@ -139,8 +139,8 @@ def record_upper(season, upper_rank, team_map):
         if isinstance(team, str):
             team = team_map.get(team)
 
-        if team is None:
-            raise TypeError("record_upper: Team解決失敗")
+        if not isinstance(team, Team):
+            raise TypeError(f"record_upper: Team解決失敗 -> {team}")
 
         team.record(season, "upper", rank)
 
@@ -206,10 +206,13 @@ def load_teams(filename):
 # シーズン
 # ======================
 def simulate_season(season, upper, lowers):
-    team_map = {t.name: t for t in upper}
-    for _ in range(2):  # 2スプリット
-        upper_rank = upper_split(upper)
-        lower_ranks = [lower_split(l) for l in lowers]
+    # 全チームを集める（ここが重要）
+    all_teams = list(upper)
+    for l in lowers:
+        all_teams.extend(l)
+
+    team_map = {t.name: t for t in all_teams}
+
 
     record_upper(season, upper_rank, team_map)
     for i, r in enumerate(lower_ranks):
