@@ -3,7 +3,6 @@ import os
 
 from league import create_initial_teams, load_teams, save_teams, simulate_season
 
-
 SAVE_FILE = "league_save.json"
 
 st.set_page_config(page_title="League Simulator", layout="wide")
