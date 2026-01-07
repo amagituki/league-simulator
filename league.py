@@ -51,15 +51,14 @@ def play_match(a, b):
 # ======================
 def round_robin(teams):
     teams = list(teams)
-    wins = {t: 0 for t in teams}
+    wins = {t.name: 0 for t in teams}
 
     for i in range(len(teams)):
         for j in range(i + 1, len(teams)):
             winner, _ = play_match(teams[i], teams[j])
-            wins[winner] += 1
+            wins[winner.name] += 1
 
-    return sorted(teams, key=lambda t: wins[t], reverse=True)
-
+    return sorted(teams, key=lambda t: wins[t.name], reverse=True)
 
 
 
