@@ -144,18 +144,22 @@ def record_lower(season, league_idx, ranking):
 # ======================
 # 保存／読込
 # ======================
-def save_teams(filename, upper, lowers):
-    data = []
+import json
 
-    for t in upper:
-        data.append(team_to_dict(t, "upper"))
-
-    for i, league in enumerate(lowers):
-        for t in league:
-            data.append(team_to_dict(t, f"lower_{i}"))
-
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+def save_teams(filename, season, upper, lowers):
+    data = {
+        "season": season,
+        "upper": [
+            {"name": t.name, "strength": t.strength} for t in upper
+        ],
+        "lowers": [
+            [
+                {"name": t.name, "strength": t.strength} for t in league
+            ] for league in lowers
+        ]
+    }
+    with open(filename, "w") as f:
+        json.dump(data, f)
 
 
 def team_to_dict(t, league):
@@ -171,26 +175,22 @@ def team_to_dict(t, league):
 
 
 def load_teams(filename):
-    with open(filename, "r", encoding="utf-8") as f:
+    import json
+    from collections import namedtuple
+
+    Team = namedtuple("Team", ["name", "strength"])
+
+    with open(filename) as f:
         data = json.load(f)
 
-    upper = []
-    lowers = [[], [], []]
+    season = data["season"]
+    upper = [Team(**t) for t in data["upper"]]
+    lowers = [
+        [Team(**t) for t in league] for league in data["lowers"]
+    ]
 
-    for d in data:
-        t = Team(d["name"], d["strength"])
-        t.history = d["history"]
-        t.promotions = d["promotions"]
-        t.relegations = d["relegations"]
-        t.titles = d["titles"]
+    return season, upper, lowers
 
-        if d["league"] == "upper":
-            upper.append(t)
-        else:
-            idx = int(d["league"].split("_")[1])
-            lowers[idx].append(t)
-
-    return upper, lowers
 
 
 # ======================
