@@ -133,11 +133,11 @@ def promotion_tournament(lower_top6, upper_bottom2):
 # ======================
 # 履歴記録
 # ======================
-def record_upper(season, ranking):
-    for i, t in enumerate(ranking, start=1):
-        t.record(season, "upper", i)
-        if i == 1:
-            t.titles += 1
+def record_upper(season, upper_rank):
+    for rank, team in enumerate(upper_rank, start=1):
+        if not isinstance(team, Team):
+            raise TypeError(f"record_upper: Teamではありません -> {team}")
+        team.record(season, "upper", rank)
 
 
 def record_lower(season, league_idx, ranking):
