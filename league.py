@@ -134,15 +134,10 @@ def promotion_tournament(lower_top6, upper_bottom2):
 # ======================
 # 履歴記録
 # ======================
-def record_upper(season, upper_rank, team_map):
+def record_upper(season, upper_rank):
     for rank, team in enumerate(upper_rank, start=1):
-        if isinstance(team, str):
-            team = team_map.get(team)
-
-        if not isinstance(team, Team):
-            raise TypeError(f"record_upper: Team解決失敗 -> {team}")
-
         team.record(season, "upper", rank)
+
 
 
 def record_lower(season, league_idx, ranking):
@@ -212,11 +207,16 @@ def simulate_season(season, upper, lowers):
         all_teams.extend(l)
 
     team_map = {t.name: t for t in all_teams}
-
+    
     upper_rank = upper_split(upper)
 
+    upper_rank = [
+    team_map[t] if isinstance(t, str) else t
+    for t in upper_rank
+]
 
-    record_upper(season, upper_rank, team_map)
+
+    record_upper(season, upper_rank)
     for i, r in enumerate(lower_ranks):
         record_lower(season, i, r)
 
