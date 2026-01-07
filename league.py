@@ -35,30 +35,36 @@ class Team:
 # 試合
 # ======================
 def play_match(a, b):
-    p = a.strength / (a.strength + b.strength)
-    winner = a if random.random() < p else b
-    loser = b if winner == a else a
+    if random.random() < a.strength / (a.strength + b.strength):
+        win = a
+        lose = b
+    else:
+        win = b
+        lose = a
 
-    winner.adjust(+1)
-    loser.adjust(-1)
-
-    return winner, loser
+    win = win._replace(strength=win.strength + 1)
+    return win, lose
 
 
 # ======================
 # ラウンドロビン
-# ======================
-def round_robin(teams, double=False):
-    wins = defaultdict(int)
-    rounds = 2 if double else 1
+# ======================def round_robin(teams):
+    teams = list(teams)
+    wins = {t.name: 0 for t in teams}
 
-    for _ in range(rounds):
-        for i in range(len(teams)):
-            for j in range(i + 1, len(teams)):
-                w, _ = play_match(teams[i], teams[j])
-                wins[w] += 1
+    for i in range(len(teams)):
+        for j in range(i + 1, len(teams)):
+            win, lose = play_match(teams[i], teams[j])
+            wins[win.name] += 1
 
-    return sorted(teams, key=lambda t: wins[t], reverse=True)
+            if teams[i].name == win.name:
+                teams[i] = win
+            else:
+                teams[j] = win
+
+    teams.sort(key=lambda t: wins[t.name], reverse=True)
+    return teams
+
 
 
 # ======================
