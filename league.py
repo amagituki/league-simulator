@@ -1,0 +1,250 @@
+import random
+import json
+from collections import defaultdict
+
+MIN_STR, MAX_STR = 30, 100
+
+# ======================
+# チーム
+# ======================
+class Team:
+    def __init__(self, name, strength):
+        self.name = name
+        self.strength = strength
+
+        self.history = []
+        self.promotions = 0
+        self.relegations = 0
+        self.titles = 0
+
+    def adjust(self, delta):
+        self.strength = max(MIN_STR, min(MAX_STR, self.strength + delta))
+
+    def record(self, season, league, rank):
+        self.history.append({
+            "season": season,
+            "league": league,
+            "rank": rank
+        })
+
+    def __repr__(self):
+        return f"{self.name}({self.strength})"
+
+
+# ======================
+# 試合
+# ======================
+def play_match(a, b):
+    p = a.strength / (a.strength + b.strength)
+    winner = a if random.random() < p else b
+    loser = b if winner == a else a
+
+    winner.adjust(+1)
+    loser.adjust(-1)
+
+    return winner, loser
+
+
+# ======================
+# ラウンドロビン
+# ======================
+def round_robin(teams, double=False):
+    wins = defaultdict(int)
+    rounds = 2 if double else 1
+
+    for _ in range(rounds):
+        for i in range(len(teams)):
+            for j in range(i + 1, len(teams)):
+                w, _ = play_match(teams[i], teams[j])
+                wins[w] += 1
+
+    return sorted(teams, key=lambda t: wins[t], reverse=True)
+
+
+# ======================
+# ダブルエリミネーション
+# ======================
+def double_elimination(teams):
+    losses = {t: 0 for t in teams}
+    alive = teams[:]
+
+    while True:
+        active = [t for t in alive if losses[t] < 2]
+        if len(active) <= 1:
+            break
+
+        random.shuffle(active)
+        for i in range(0, len(active), 2):
+            if i + 1 >= len(active):
+                continue
+            w, l = play_match(active[i], active[i + 1])
+            losses[l] += 1
+
+    return sorted(teams, key=lambda t: losses[t])
+
+
+# ======================
+# 上位リーグ（1スプリット）
+# ======================
+def upper_split(teams):
+    random.shuffle(teams)
+    g1, g2 = teams[:5], teams[5:]
+
+    qualified = round_robin(g1)[:3] + round_robin(g2)[:3]
+    return round_robin(qualified, double=True)
+
+
+# ======================
+# 下部リーグ（1スプリット）
+# ======================
+def lower_split(teams):
+    random.shuffle(teams)
+    g1, g2 = teams[:4], teams[4:]
+
+    qualified = round_robin(g1, double=True)[:2] \
+              + round_robin(g2, double=True)[:2]
+
+    return double_elimination(qualified)
+
+
+# ======================
+# 入れ替え戦
+# ======================
+def promotion_tournament(lower_top6, upper_bottom2):
+    ranking = double_elimination(lower_top6 + upper_bottom2)
+    promoted = ranking[:2]
+
+    for t in promoted:
+        t.promotions += 1
+        t.adjust(+3)
+
+    for t in upper_bottom2:
+        if t not in promoted:
+            t.relegations += 1
+            t.adjust(-3)
+
+    return promoted
+
+
+# ======================
+# 履歴記録
+# ======================
+def record_upper(season, ranking):
+    for i, t in enumerate(ranking, start=1):
+        t.record(season, "upper", i)
+        if i == 1:
+            t.titles += 1
+
+
+def record_lower(season, league_idx, ranking):
+    for i, t in enumerate(ranking, start=1):
+        t.record(season, f"lower_{league_idx}", i)
+
+
+# ======================
+# 保存／読込
+# ======================
+def save_teams(filename, upper, lowers):
+    data = []
+
+    for t in upper:
+        data.append(team_to_dict(t, "upper"))
+
+    for i, league in enumerate(lowers):
+        for t in league:
+            data.append(team_to_dict(t, f"lower_{i}"))
+
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def team_to_dict(t, league):
+    return {
+        "name": t.name,
+        "strength": t.strength,
+        "league": league,
+        "history": t.history,
+        "promotions": t.promotions,
+        "relegations": t.relegations,
+        "titles": t.titles
+    }
+
+
+def load_teams(filename):
+    with open(filename, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    upper = []
+    lowers = [[], [], []]
+
+    for d in data:
+        t = Team(d["name"], d["strength"])
+        t.history = d["history"]
+        t.promotions = d["promotions"]
+        t.relegations = d["relegations"]
+        t.titles = d["titles"]
+
+        if d["league"] == "upper":
+            upper.append(t)
+        else:
+            idx = int(d["league"].split("_")[1])
+            lowers[idx].append(t)
+
+    return upper, lowers
+
+
+# ======================
+# シーズン
+# ======================
+def simulate_season(season, upper, lowers):
+    for _ in range(2):  # 2スプリット
+        upper_rank = upper_split(upper)
+        lower_ranks = [lower_split(l) for l in lowers]
+
+    record_upper(season, upper_rank)
+    for i, r in enumerate(lower_ranks):
+        record_lower(season, i, r)
+
+    lower_top6 = [r[0] for r in lower_ranks] + [r[1] for r in lower_ranks]
+    upper_bottom2 = upper_rank[-2:]
+
+    promoted = promotion_tournament(lower_top6, upper_bottom2)
+
+    for t in promoted:
+        if t in upper_bottom2:
+            continue
+        upper.append(t)
+        for league in lowers:
+            if t in league:
+                league.remove(t)
+
+    for t in upper_bottom2:
+        if t not in promoted:
+            upper.remove(t)
+            lowers[random.randint(0, 2)].append(t)
+
+
+# ======================
+# 初期化 & 実行
+# ======================
+def create_initial_teams():
+    upper = [Team(f"U{i}", random.randint(70, 90)) for i in range(10)]
+    lowers = [
+        [Team(f"L{l}-{i}", random.randint(40, 70)) for i in range(8)]
+        for l in range(3)
+    ]
+    return upper, lowers
+
+
+if __name__ == "__main__":
+    try:
+        upper, lowers = load_teams("league_save.json")
+        season = max(h["season"] for t in upper for h in t.history) + 1
+    except:
+        upper, lowers = create_initial_teams()
+        season = 1
+
+    simulate_season(season, upper, lowers)
+    save_teams("league_save.json", upper, lowers)
+
+    print(f"Season {season} 完了")
