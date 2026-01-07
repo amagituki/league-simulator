@@ -235,16 +235,3 @@ def create_initial_teams():
     ]
     return upper, lowers
 
-
-if __name__ == "__main__":
-    try:
-        upper, lowers = load_teams("league_save.json")
-        season = max(h["season"] for t in upper for h in t.history) + 1
-    except:
-        upper, lowers = create_initial_teams()
-        season = 1
-
-    simulate_season(season, upper, lowers)
-    save_teams("league_save.json", upper, lowers)
-
-    print(f"Season {season} 完了")
