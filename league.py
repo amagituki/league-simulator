@@ -62,7 +62,7 @@ def round_robin(teams, double=False):
                 wins[winner.name] += 1
 
     return sorted(teams, key=lambda t: wins[t.name], reverse=True)
-    
+
 
 
 # ======================
