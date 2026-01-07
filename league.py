@@ -56,13 +56,11 @@ def round_robin(teams, double=False):
     for i in range(len(teams)):
         for j in range(i + 1, len(teams)):
             t1, t2 = teams[i], teams[j]
-
             for _ in range(2 if double else 1):
                 winner = t1 if random.random() < t1.strength / (t1.strength + t2.strength) else t2
                 wins[winner] += 1
 
     return sorted(teams, key=lambda t: wins[t], reverse=True)
-
 
 
 # ======================
