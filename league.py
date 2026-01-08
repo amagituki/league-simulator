@@ -52,11 +52,9 @@ class Team:
 # ======================
 def play_match(a, b):
     if random.random() < a.strength / (a.strength + b.strength):
-        win = a
-        lose = b
+        win, lose = a, b
     else:
-        win = b
-        lose = a
+        win, lose = b, a
 
     win.adjust(+1)
     lose.adjust(-1)
