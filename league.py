@@ -131,11 +131,13 @@ def promotion_tournament(lower_top6, upper_bottom2):
 # ======================
 # 履歴記録
 # ======================
+import streamlit as st
+
 def record_upper(season, upper_rank):
     for rank, team in enumerate(upper_rank, 1):
-        print("DEBUG team =", team, "type =", type(team))
+        st.write("DEBUG team:", team, "type:", type(team))
         team.record(season, "upper", rank)
-
+        
 
 
 
