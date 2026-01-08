@@ -58,8 +58,10 @@ def play_match(a, b):
         win = b
         lose = a
 
-    win = win._replace(strength=win.strength + 1)
+    win.adjust(+1)
+    lose.adjust(-1)
     return win, lose
+
 
 
 # ======================
@@ -150,8 +152,7 @@ def promotion_tournament(lower_top6, upper_bottom2):
 import streamlit as st
 
 def record_upper(season, upper_rank):
-    for rank, team in enumerate(upper_rank, 1):
-        st.write("DEBUG team:", team, "type:", type(team))
+    for rank, team in enumerate(upper_rank, 1)
         team.record(season, "upper", rank)
         
 
