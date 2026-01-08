@@ -36,3 +36,23 @@ for idx, league in enumerate(lowers, start=1):
     for i, t in enumerate(league, start=1):
         st.write(f"{i}. {t.name} ｜ STR {t.strength}")
 
+st.header("📜 チーム履歴")
+
+all_teams = upper[:]
+for lg in lowers:
+    all_teams.extend(lg)
+
+team = st.selectbox(
+    "チームを選択",
+    all_teams,
+    format_func=lambda t: t.name
+)
+
+st.write(f"### {team.name}")
+st.write(f"現在STR: {team.strength}")
+st.write(f"昇格: {team.promotions} / 降格: {team.relegations}")
+
+for h in team.history:
+    st.write(
+        f"Season {h['season']}｜{h['league']}｜{h['rank']}位"
+    )
