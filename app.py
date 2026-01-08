@@ -56,3 +56,16 @@ for h in team.history:
     st.write(
         f"Season {h['season']}｜{h['league']}｜{h['rank']}位"
     )
+
+st.header("📈 強さ推移")
+
+seasons = [h["season"] for h in team.history]
+strengths = [h.get("strength", team.strength) for h in team.history]
+
+if seasons:
+    st.line_chart(
+        {"STR": strengths},
+        x=seasons
+    )
+else:
+    st.write("履歴がありません")
