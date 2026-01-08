@@ -69,27 +69,27 @@ def play_match(a, b):
 # ======================
 def round_robin(teams, double=False):
     teams = list(teams)
-    wins = {team: 0 for team in teams}
+    wins = [0] * len(teams)
 
     for i in range(len(teams)):
         for j in range(i + 1, len(teams)):
-            t1, t2 = teams[i], teams[j]
             for _ in range(2 if double else 1):
-                winner = t1 if random.random() < t1.strength / (t1.strength + t2.strength) else t2
-                wins[winner] += 1
+                if random.random() < teams[i].strength / (teams[i].strength + teams[j].strength):
+                    wins[i] += 1
+                else:
+                    wins[j] += 1
 
-    return sorted(teams, key=lambda t: wins[t], reverse=True)
-
+    return [t for _, t in sorted(zip(wins, teams), reverse=True)]
+    
 
 # ======================
 # ダブルエリミネーション
 # ======================
 def double_elimination(teams):
-    losses = {t: 0 for t in teams}
-    alive = teams[:]
+    losses = [0] * len(teams)
 
     while True:
-        active = [t for t in alive if losses[t] < 2]
+        active = [i for i in range(len(teams)) if losses[i] < 2]
         if len(active) <= 1:
             break
 
@@ -97,10 +97,10 @@ def double_elimination(teams):
         for i in range(0, len(active), 2):
             if i + 1 >= len(active):
                 continue
-            w, l = play_match(active[i], active[i + 1])
-            losses[l] += 1
+            w, l = play_match(teams[active[i]], teams[active[i + 1]])
+            losses[teams.index(l)] += 1
 
-    return sorted(teams, key=lambda t: losses[t])
+    return [t for _, t in sorted(zip(losses, teams))]
 
 
 # ======================
