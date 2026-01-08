@@ -26,7 +26,6 @@ class Team:
             "rank": rank
         })
 
-    # ★追加
     def to_dict(self):
         return {
             "name": self.name,
@@ -37,7 +36,6 @@ class Team:
             "titles": self.titles
         }
 
-    # ★追加
     @staticmethod
     def from_dict(d):
         t = Team(d["name"], d["strength"])
@@ -46,6 +44,7 @@ class Team:
         t.relegations = d.get("relegations", 0)
         t.titles = d.get("titles", 0)
         return t
+
 
 
 # ======================
