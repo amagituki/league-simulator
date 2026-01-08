@@ -108,34 +108,41 @@ def load_teams(path):
     )
 
 def simulate_season(season, upper, lowers):
-    upper_rank = upper_split(upper)
-    for i, t in enumerate(upper_rank, 1):
+    # ======================
+    # 上位リーグ
+    # ======================
+    upper_rank = round_robin(upper, double=True)
+    for i, t in enumerate(upper_rank, start=1):
         t.record(season, "upper", i)
 
-    lower_rankings = []
-    lower_candidates = []
+    promoted_from_lower = []
+    relegated_from_upper = upper_rank[-2:]
 
-    for idx, lg in enumerate(lowers, 1):
-        r = lower_split(lg)
-        for i, t in enumerate(r, 1):
+    # ======================
+    # 下位リーグ
+    # ======================
+    new_lowers = []
+    for idx, league in enumerate(lowers, start=1):
+        ranking = round_robin(league, double=True)
+        for i, t in enumerate(ranking, start=1):
             t.record(season, f"lower_{idx}", i)
-        lower_rankings.append(r)
-        lower_candidates.extend(r)
 
-    promoted = promotion_tournament(lower_candidates, upper_rank[-2:])
-    new_upper = upper_rank[:-2] + promoted
+        promoted_from_lower.extend(ranking[:1])  # 各下位1昇格
+        new_lowers.append(ranking[1:])           # 残りは残留
 
-    # 上位に行かなかったチームを下部へ
-    remaining_lower = [
-        t for t in lower_candidates + upper_rank[-2:]
-        if t not in promoted
-    ]
+    # ======================
+    # 昇降格処理
+    # ======================
+    new_upper = upper_rank[:-2] + promoted_from_lower
 
-    random.shuffle(remaining_lower)
+    # 降格チームを下位へ均等配分
+    for i, t in enumerate(relegated_from_upper):
+        new_lowers[i % len(new_lowers)].append(t)
 
-    new_lowers = [
-        remaining_lower[i*8:(i+1)*8]
-        for i in range(len(lowers))
-    ]
+    # 昇降格カウント
+    for t in promoted_from_lower:
+        t.promotions += 1
+    for t in relegated_from_upper:
+        t.relegations += 1
 
     return season + 1, new_upper, new_lowers
