@@ -17,14 +17,13 @@ class Team:
 
     def adjust(self, delta):
         self.strength = max(MIN_STR, min(MAX_STR, self.strength + delta))
-        
-    def record(self, season, league, rank):
-        self.history.append({
-             "season": season,
-             "league": league,
-             "rank": rank,
-             "strength": self.strength   # ← 追加
-         })
+        def record(self, season, league, rank):
+            self.history.append({
+                "season": season,
+                "league": league,
+                "rank": rank,
+                "strength": self.strength   # ← tuika
+            })
   
 
 
