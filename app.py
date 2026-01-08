@@ -17,7 +17,7 @@ else:
 
 if st.button("次のシーズン"):
     season += 1
-    league.simulate_season(season, upper, lowers)
+    season, upper, lowers = league.simulate_season(season, upper, lowers)
     league.save_teams(SAVE_FILE, season, upper, lowers)
     st.success(f"Season {season} 完了")
 
