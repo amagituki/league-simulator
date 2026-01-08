@@ -17,13 +17,16 @@ class Team:
 
     def adjust(self, delta):
         self.strength = max(MIN_STR, min(MAX_STR, self.strength + delta))
-
+        
+        
     def record(self, season, league, rank):
         self.history.append({
             "season": season,
             "league": league,
-            "rank": rank
+            "rank": rank,
+            "strength": self.strength
         })
+
 
     def to_dict(self):
         return {
