@@ -18,3 +18,21 @@ if st.button("次のシーズン"):
     league.simulate_season(season, upper, lowers)
     league.save_teams(SAVE_FILE, season, upper, lowers)
     st.success(f"Season {season} 完了")
+
+st.header(f"Season {season-1} 結果")
+
+# ======================
+# 上位リーグ
+# ======================
+st.subheader("🏆 上位リーグ順位")
+
+for i, t in enumerate(upper, start=1):
+    st.write(f"{i}. {t.name} ｜ STR {t.strength}")
+
+st.subheader("⬇ 下部リーグ")
+
+for idx, league in enumerate(lowers, start=1):
+    st.write(f"--- 下部リーグ {idx} ---")
+    for i, t in enumerate(league, start=1):
+        st.write(f"{i}. {t.name} ｜ STR {t.strength}")
+
