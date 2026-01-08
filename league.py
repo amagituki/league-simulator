@@ -17,15 +17,15 @@ class Team:
 
     def adjust(self, delta):
         self.strength = max(MIN_STR, min(MAX_STR, self.strength + delta))
-        
-        
-    def record(self, season, league, rank):
-        self.history.append({
-            "season": season,
-            "league": league,
-            "rank": rank,
-            "strength": self.strength
-        })
+        def record(self, season, league, rank):
+            self.history.append({
+                "season": season,
+                "league": league,
+                "rank": rank,
+                "strength": self.strength   # ← 追加
+            })
+    
+  
 
 
     def to_dict(self):
@@ -224,19 +224,10 @@ def simulate_season(season, upper, lowers):
 # 初期チーム生成
 # ======================
 def create_initial_teams():
-    # 上位リーグ（10チーム）
-    upper = [
-        Team(f"U{i+1}", random.randint(60, 90))
-        for i in range(10)
+    upper = [Team(f"U{i+1}", random.randint(60, 80)) for i in range(10)]
+    lowers = [
+        [Team(f"L{idx+1}-{i+1}", random.randint(40, 60)) for i in range(8)]
+        for idx in range(2)
     ]
-
-    # 下部リーグ（例：2リーグ × 各8チーム）
-    lowers = []
-    for l in range(2):
-        league = [
-            Team(f"L{l+1}-{i+1}", random.randint(40, 70))
-            for i in range(8)
-        ]
-        lowers.append(league)
-
     return upper, lowers
+
