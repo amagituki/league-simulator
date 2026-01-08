@@ -16,12 +16,11 @@ else:
     league.save_teams(SAVE_FILE, season, upper, lowers)
 
 if st.button("次のシーズン"):
-    season += 1
     season, upper, lowers = league.simulate_season(season, upper, lowers)
     league.save_teams(SAVE_FILE, season, upper, lowers)
     st.success(f"Season {season} 完了")
 
-st.header(f"Season {season-1} 結果")
+st.header(f"Season {season} 結果")
 
 # ======================
 # 上位リーグ
@@ -80,6 +79,3 @@ if st.button("🗑 データを完全リセット"):
     if os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
     st.rerun()
-
-result = league.simulate_season(season, upper, lowers)
-st.write("DEBUG simulate result:", result, type(result))
