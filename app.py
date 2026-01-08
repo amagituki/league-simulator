@@ -1,6 +1,6 @@
 import streamlit as st
-import os
 import league
+import os
 
 SAVE_FILE = "league_save.json"
 
