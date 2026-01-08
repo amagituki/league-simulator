@@ -19,3 +19,11 @@ if st.button("次のシーズン"):
 st.header(f"Season {season}")
 for i, t in enumerate(upper, 1):
     st.write(f"{i}. {t.name} STR:{t.strength}")
+
+if st.button("🧨 完全強制リセット"):
+    try:
+        os.remove(SAVE_FILE)
+        st.success("league_save.json を削除しました")
+    except FileNotFoundError:
+        st.warning("保存データは存在しませんでした")
+    st.rerun()
