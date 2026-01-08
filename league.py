@@ -11,7 +11,6 @@ class Team:
     def __init__(self, name, strength):
         self.name = name
         self.strength = strength
-
         self.history = []
         self.promotions = 0
         self.relegations = 0
@@ -27,8 +26,26 @@ class Team:
             "rank": rank
         })
 
-    def __repr__(self):
-        return f"{self.name}({self.strength})"
+    # ★追加
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "strength": self.strength,
+            "history": self.history,
+            "promotions": self.promotions,
+            "relegations": self.relegations,
+            "titles": self.titles
+        }
+
+    # ★追加
+    @staticmethod
+    def from_dict(d):
+        t = Team(d["name"], d["strength"])
+        t.history = d.get("history", [])
+        t.promotions = d.get("promotions", 0)
+        t.relegations = d.get("relegations", 0)
+        t.titles = d.get("titles", 0)
+        return t
 
 
 # ======================
@@ -149,22 +166,18 @@ def record_lower(season, league_idx, ranking):
 # ======================
 # 保存／読込
 # ======================
-import json
-
-def save_teams(filename, season, upper, lowers):
+def save_teams(path, season, upper, lowers):
     data = {
         "season": season,
-        "upper": [
-            {"name": t.name, "strength": t.strength} for t in upper
-        ],
+        "upper": [t.to_dict() for t in upper],
         "lowers": [
-            [
-                {"name": t.name, "strength": t.strength} for t in league
-            ] for league in lowers
+            [t.to_dict() for t in league]
+            for league in lowers
         ]
     }
-    with open(filename, "w") as f:
-        json.dump(data, f)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
 
 
 def team_to_dict(t, league):
@@ -189,10 +202,12 @@ def load_teams(filename):
         data = json.load(f)
 
     season = data["season"]
-    upper = [Team(**t) for t in data["upper"]]
+    upper = [Team.from_dict(d) for d in data["upper"]]
     lowers = [
-        [Team(**t) for t in league] for league in data["lowers"]
+        [Team.from_dict(d) for d in league]
+        for league in data["lowers"]
     ]
+
 
     return season, upper, lowers
 
