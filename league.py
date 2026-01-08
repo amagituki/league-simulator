@@ -120,9 +120,12 @@ def upper_split(teams):
 def lower_split(teams):
     random.shuffle(teams)
     g1, g2 = teams[:4], teams[4:]
+    
+    qualified = (
+        round_robin(g1, double=True)[:2]
+        + round_robin(g2, double=True)[:2]
+    )
 
-    qualified = round_robin(g1, double=True)[:2] \
-              + round_robin(g2, double=True)[:2]
 
     return double_elimination(qualified)
 
