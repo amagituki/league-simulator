@@ -80,3 +80,6 @@ if st.button("🗑 データを完全リセット"):
     if os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
     st.rerun()
+
+result = league.simulate_season(season, upper, lowers)
+st.write("DEBUG simulate result:", result, type(result))
