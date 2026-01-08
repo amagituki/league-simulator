@@ -155,7 +155,7 @@ def promotion_tournament(lower_top6, upper_bottom2):
 import streamlit as st
 
 def record_upper(season, upper_rank):
-    for rank, team in enumerate(upper_rank, 1)
+    for rank, team in enumerate(upper_rank, 1):
         team.record(season, "upper", rank)
         
 
