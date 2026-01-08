@@ -1,6 +1,8 @@
 import streamlit as st
 import league
 import os
+import pandas as pd
+
 
 SAVE_FILE = "league_save.json"
 
@@ -57,15 +59,20 @@ for h in team.history:
         f"Season {h['season']}｜{h['league']}｜{h['rank']}位"
     )
 
+
 st.header("📈 強さ推移")
 
-seasons = [h["season"] for h in team.history]
-strengths = [h.get("strength", team.strength) for h in team.history]
+if team.history:
+    df = pd.DataFrame(team.history)
 
-if seasons:
-    st.line_chart(
-        {"STR": strengths},
-        x=seasons
-    )
+    # 念のため存在確認
+    if "strength" in df.columns:
+        df = df.sort_values("season")
+        df = df.set_index("season")
+
+        st.line_chart(df["strength"])
+    else:
+        st.write("STR履歴がまだ記録されていません")
 else:
     st.write("履歴がありません")
+
