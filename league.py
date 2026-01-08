@@ -194,21 +194,31 @@ def simulate_season(season, upper, lowers):
 
     # 入れ替え戦
     promoted = promotion_tournament(lower_top, upper_bottom2)
-
+    
     # 上位リーグ更新
     new_upper = upper_rank[:-2] + promoted
 
-    # 下部リーグ再編（簡易）
-    remaining = [t for t in upper_bottom2 + lower_top if t not in promoted]
-    while len(remaining) < 8 * len(lowers):
-        remaining.append(random.choice(remaining))
+    # 降格チーム
+    relegated = [t for t in upper_bottom2 if t not in promoted]
+    for t in relegated:
+        t.relegations += 1
+        t.adjust(-3)
 
+    # 下位リーグ用プール
+    lower_pool = relegated + [
+        t for t in lower_top if t not in promoted
+    ]
+
+    # 足りない場合は下位から補充（安全装置）
+    while len(lower_pool) < 8 * len(lowers):
+        lower_pool.append(random.choice(lower_pool))
+
+    # 下位リーグ再編（固定人数）
     new_lowers = [
-        remaining[i*8:(i+1)*8]
+        lower_pool[i*8:(i+1)*8]
         for i in range(len(lowers))
     ]
 
-    return season + 1, new_upper, new_lowers
 
 # ======================
 # 初期チーム生成
