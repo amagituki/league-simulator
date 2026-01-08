@@ -76,3 +76,7 @@ if team.history:
 else:
     st.write("履歴がありません")
 
+if st.button("🗑 データを完全リセット"):
+    if os.path.exists(SAVE_FILE):
+        os.remove(SAVE_FILE)
+    st.experimental_rerun()
