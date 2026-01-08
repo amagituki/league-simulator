@@ -209,3 +209,24 @@ def simulate_season(season, upper, lowers):
     ]
 
     return season + 1, new_upper, new_lowers
+
+# ======================
+# 初期チーム生成
+# ======================
+def create_initial_teams():
+    # 上位リーグ（10チーム）
+    upper = [
+        Team(f"U{i+1}", random.randint(60, 90))
+        for i in range(10)
+    ]
+
+    # 下部リーグ（例：2リーグ × 各8チーム）
+    lowers = []
+    for l in range(2):
+        league = [
+            Team(f"L{l+1}-{i+1}", random.randint(40, 70))
+            for i in range(8)
+        ]
+        lowers.append(league)
+
+    return upper, lowers
