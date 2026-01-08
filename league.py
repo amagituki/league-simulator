@@ -99,3 +99,41 @@ def load_teams(path):
         for league in data["lowers"]
     ]
     return season, upper, lowers
+
+# ======================
+# シーズン進行
+# ======================
+def simulate_season(season, upper, lowers):
+    # 上位リーグ
+    upper_rank = upper_split(upper)
+    for i, t in enumerate(upper_rank, start=1):
+        t.record(season, "upper", i)
+
+    # 下部リーグ
+    lower_top = []
+    for idx, league in enumerate(lowers, start=1):
+        ranking = lower_split(league)
+        for i, t in enumerate(ranking, start=1):
+            t.record(season, f"lower_{idx}", i)
+        lower_top.extend(ranking[:2])  # 各下部上位2
+
+    # 上位下位2
+    upper_bottom2 = upper_rank[-2:]
+
+    # 入れ替え戦
+    promoted = promotion_tournament(lower_top, upper_bottom2)
+
+    # 上位リーグ更新
+    new_upper = upper_rank[:-2] + promoted
+
+    # 下部リーグ再編（簡易）
+    remaining = [t for t in upper_bottom2 + lower_top if t not in promoted]
+    while len(remaining) < 8 * len(lowers):
+        remaining.append(random.choice(remaining))
+
+    new_lowers = [
+        remaining[i*8:(i+1)*8]
+        for i in range(len(lowers))
+    ]
+
+    return season + 1, new_upper, new_lowers
