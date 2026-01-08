@@ -107,20 +107,35 @@ def load_teams(path):
         [[Team.from_dict(x) for x in lg] for lg in d["lowers"]]
     )
 
-
 def simulate_season(season, upper, lowers):
     upper_rank = upper_split(upper)
     for i, t in enumerate(upper_rank, 1):
         t.record(season, "upper", i)
 
-    lower_top = []
+    lower_rankings = []
+    lower_candidates = []
+
     for idx, lg in enumerate(lowers, 1):
         r = lower_split(lg)
         for i, t in enumerate(r, 1):
             t.record(season, f"lower_{idx}", i)
-        lower_top.extend(r[:2])
+        lower_rankings.append(r)
+        lower_candidates.extend(r)
 
-    promoted = promotion_tournament(lower_top, upper_rank[-2:])
+    promoted = promotion_tournament(lower_candidates, upper_rank[-2:])
     new_upper = upper_rank[:-2] + promoted
-    new_lowers = [lower_top[i*8:(i+1)*8] for i in range(len(lowers))]
+
+    # 上位に行かなかったチームを下部へ
+    remaining_lower = [
+        t for t in lower_candidates + upper_rank[-2:]
+        if t not in promoted
+    ]
+
+    random.shuffle(remaining_lower)
+
+    new_lowers = [
+        remaining_lower[i*8:(i+1)*8]
+        for i in range(len(lowers))
+    ]
+
     return season + 1, new_upper, new_lowers
